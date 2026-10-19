@@ -30,8 +30,18 @@
         {
             <div class="col-md-6 col-lg-4">
                 <div class="plugin-card">
-                    <div class="card-img-top p-0 overflow-hidden" style="height: 180px;">
-                        <img src="@plugin.ImageUrl" alt="@plugin.Name" class="w-100 h-100" style="object-fit: cover;" />
+                    <div class="card-img-top p-0 overflow-hidden d-flex align-items-center justify-content-center" style="height: 180px; background: #13141a; border-bottom: 1px solid var(--border-color);">
+                        @if (!string.IsNullOrEmpty(plugin.ImageUrl))
+                        {
+                            <img src="@plugin.ImageUrl" alt="@plugin.Name" class="w-100 h-100" style="object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="text-center text-secondary opacity-50">
+                                <i class="bi bi-image fs-1 d-block mb-1"></i>
+                                <small style="font-size: 0.75rem;">Plugin Artwork</small>
+                            </div>
+                        }
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">@plugin.Name</h5>

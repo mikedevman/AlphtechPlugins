@@ -23,7 +23,16 @@
                 {
                     <div class="cart-item">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="@item.ImageUrl" alt="@item.ProductName" style="width: 56px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);" />
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="@item.ProductName" style="width: 56px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center rounded" style="width: 56px; height: 34px; background: #13141a; border: 1px solid var(--border-color);">
+                                    <i class="bi bi-image text-secondary opacity-50"></i>
+                                </div>
+                            }
                             <div>
                                 <h6 class="mb-0 fw-semibold">@item.ProductName</h6>
                                 <small class="text-secondary">Digital Plugin License</small>
