@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Database Context with SQLite
 builder.Services.AddDbContext<AlphtechDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=alphtech.db"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=Data/alphtech.db"));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IPluginCatalogService, PluginCatalogService>();
