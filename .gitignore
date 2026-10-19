@@ -1,0 +1,15 @@
+# .NET build artifacts
+bin/
+obj/
+publish/
+
+# SQLite databases (auto-created on startup)
+*.db
+*.db-shm
+*.db-wal
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo

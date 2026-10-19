@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using AlphtechPlugins.Data;
 using AlphtechPlugins.Models;
 using AlphtechPlugins.Services;
 
@@ -8,11 +9,13 @@ public class CheckoutController : Controller
 {
     private readonly ICartService _cart;
     private readonly ILicenseService _license;
+    private readonly AlphtechDbContext _db;
 
-    public CheckoutController(ICartService cart, ILicenseService license)
+    public CheckoutController(ICartService cart, ILicenseService license, AlphtechDbContext db)
     {
         _cart = cart;
         _license = license;
+        _db = db;
     }
 
     public IActionResult Index()
@@ -56,6 +59,20 @@ public class CheckoutController : Controller
                 LicenseKey = _license.GenerateKey(ci.ProductId, model.Email)
             }).ToList()
         };
+
+        // Increment download counters on purchased plugins
+        foreach (var item in order.Items)
+        {
+            var product = _db.Products.FirstOrDefault(p => p.Id == item.ProductId);
+            if (product != null)
+            {
+                product.Downloads++;
+            }
+        }
+
+        // Persist order and items into SQLite database
+        _db.Orders.Add(order);
+        _db.SaveChanges();
 
         _cart.Clear();
         return View("Confirmation", order);
