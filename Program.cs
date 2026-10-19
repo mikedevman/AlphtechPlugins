@@ -15,11 +15,11 @@ builder.Services.AddSingleton<ILicenseService, LicenseService>();
 
 var app = builder.Build();
 
-// Ensure SQLite database is created and seeded with products on startup
+// Ensure SQLite database and tables exist on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AlphtechDbContext>();
-    AlphtechDbContext.SeedData(db);
+    db.Database.EnsureCreated();
 }
 
 if (!app.Environment.IsDevelopment())
