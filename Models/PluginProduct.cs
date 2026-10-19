@@ -14,6 +14,7 @@ public class PluginProduct
     public string IconClass { get; set; } = string.Empty;
     public double Rating { get; set; } = 4.5;
     public int Downloads { get; set; } = 0;
+    public int DisplayOrder { get; set; } = 0;
     public List<string> Features { get; set; } = new();
     public string SampleRate { get; set; } = "Up to 192kHz";
     public string BitDepth { get; set; } = "64-bit floating point";

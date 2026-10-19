@@ -22,12 +22,12 @@ public class PluginCatalogService : IPluginCatalogService
     }
 
     public List<PluginProduct> GetAll() =>
-        _db.Products.AsNoTracking().ToList();
+        _db.Products.AsNoTracking().OrderBy(p => p.DisplayOrder).ToList();
 
     public List<PluginProduct> GetByCategory(string category) =>
         string.IsNullOrEmpty(category) || category == "All"
-            ? _db.Products.AsNoTracking().ToList()
-            : _db.Products.AsNoTracking().Where(p => p.Category == category).ToList();
+            ? _db.Products.AsNoTracking().OrderBy(p => p.DisplayOrder).ToList()
+            : _db.Products.AsNoTracking().Where(p => p.Category == category).OrderBy(p => p.DisplayOrder).ToList();
 
     public PluginProduct? GetById(string id) =>
         _db.Products.AsNoTracking().FirstOrDefault(p => p.Id == id);
