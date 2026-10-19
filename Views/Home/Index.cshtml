@@ -1,0 +1,67 @@
+@model List<AlphtechPlugins.Models.PluginProduct>
+@{
+    ViewData["Title"] = "Store";
+    var categories = ViewBag.Categories as List<string>;
+    var selected = ViewBag.SelectedCategory as string;
+}
+
+<section class="hero text-center">
+    <div class="container">
+        <h1>Alphtech<span class="text-info">Plugins</span></h1>
+        <p class="text-secondary fs-5 mb-3">Studio-Grade DSP Plugins & Virtual Instruments</p>
+        <span class="badge-free"><i class="bi bi-gift-fill me-1"></i> All Plugins Currently FREE</span>
+    </div>
+</section>
+
+<div class="container my-4">
+    <div class="category-pills d-flex flex-wrap gap-2 mb-4">
+        <a href="/" class="btn @(string.IsNullOrEmpty(selected) ? "active" : "")">All</a>
+        @if (categories != null)
+        {
+            @foreach (var cat in categories)
+            {
+                <a href="/?category=@cat" class="btn @(selected == cat ? "active" : "")">@cat</a>
+            }
+        }
+    </div>
+
+    <div class="row g-4">
+        @foreach (var plugin in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="plugin-card">
+                    <div class="card-img-top p-0 overflow-hidden" style="height: 180px;">
+                        <img src="@plugin.ImageUrl" alt="@plugin.Name" class="w-100 h-100" style="object-fit: cover;" />
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@plugin.Name</h5>
+                        <p class="tagline">@plugin.Tagline</p>
+                        <div class="formats mb-2">
+                            @foreach (var fmt in plugin.Formats.Split(", "))
+                            {
+                                <span class="badge bg-secondary">@fmt</span>
+                            }
+                            <span class="badge bg-dark border border-secondary">@plugin.Platforms</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="rating"><i class="bi bi-star-fill"></i> @plugin.Rating</span>
+                            <span class="downloads"><i class="bi bi-download"></i> @plugin.Downloads.ToString("N0")</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-tag">@plugin.PriceDisplay</span>
+                            <div class="d-flex gap-2">
+                                <a href="/Plugin/Details/@plugin.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                                <form method="post" action="/Cart/Add">
+                                    <input type="hidden" name="productId" value="@plugin.Id" />
+                                    <button type="submit" class="btn btn-sm btn-accent">
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

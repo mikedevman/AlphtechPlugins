@@ -1,0 +1,64 @@
+@model List<AlphtechPlugins.Models.CartItem>
+@{
+    ViewData["Title"] = "Cart";
+    var total = (decimal)(ViewBag.Total ?? 0m);
+}
+
+<div class="container my-5">
+    <h2 class="fw-bold mb-4"><i class="bi bi-cart3 text-info"></i> Your Cart</h2>
+
+    @if (Model.Count == 0)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x" style="font-size: 4rem; color: var(--text-secondary);"></i>
+            <p class="text-secondary fs-5 mt-3">Your cart is empty</p>
+            <a href="/" class="btn btn-accent mt-2">Browse Plugins</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                @foreach (var item in Model)
+                {
+                    <div class="cart-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="@item.ImageUrl" alt="@item.ProductName" style="width: 56px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);" />
+                            <div>
+                                <h6 class="mb-0 fw-semibold">@item.ProductName</h6>
+                                <small class="text-secondary">Digital Plugin License</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-success fw-bold">@(item.Price == 0 ? "FREE" : $"${item.Price:F2}")</span>
+                            <form method="post" action="/Cart/Remove">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h5 class="fw-bold mb-3">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Items</span>
+                        <span>@Model.Count plugin(s)</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Subtotal</span>
+                        <span>$@total.ToString("F2")</span>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="fw-bold">Total</span>
+                        <span class="fw-bold text-success fs-5">$@total.ToString("F2")</span>
+                    </div>
+                    <a href="/Checkout" class="btn btn-accent w-100 btn-lg"><i class="bi bi-bag-check"></i> Checkout</a>
+                    <a href="/" class="btn btn-outline-secondary w-100 mt-2">Continue Browsing</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

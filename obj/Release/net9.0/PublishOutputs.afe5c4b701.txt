@@ -1,0 +1,7 @@
+C:\Users\Admin\Documents\AlphtechPlugins\publish\AlphtechPlugins.exe
+C:\Users\Admin\Documents\AlphtechPlugins\publish\appsettings.Development.json
+C:\Users\Admin\Documents\AlphtechPlugins\publish\appsettings.json
+C:\Users\Admin\Documents\AlphtechPlugins\publish\AlphtechPlugins.dll
+C:\Users\Admin\Documents\AlphtechPlugins\publish\AlphtechPlugins.deps.json
+C:\Users\Admin\Documents\AlphtechPlugins\publish\AlphtechPlugins.runtimeconfig.json
+C:\Users\Admin\Documents\AlphtechPlugins\publish\AlphtechPlugins.pdb

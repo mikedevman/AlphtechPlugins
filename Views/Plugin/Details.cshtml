@@ -1,0 +1,185 @@
+@model AlphtechPlugins.Models.PluginProduct
+@{
+    ViewData["Title"] = Model.Name;
+    var inCart = (bool)(ViewBag.InCart ?? false);
+}
+
+<section class="detail-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <div class="mb-3">
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border border-secondary shadow" style="max-height: 220px;" />
+                </div>
+            </div>
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="/" class="text-info">Store</a></li>
+                        <li class="breadcrumb-item"><a href="/?category=@Model.Category" class="text-info">@Model.Category</a></li>
+                        <li class="breadcrumb-item active text-secondary">@Model.Name</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold mb-1">@Model.Name</h1>
+                <p class="text-secondary fs-5 mb-3">@Model.Tagline</p>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="price-tag fs-3 text-success fw-bold">@Model.PriceDisplay</span>
+                    <span class="rating fs-5"><i class="bi bi-star-fill text-warning"></i> @Model.Rating</span>
+                    <span class="text-secondary"><i class="bi bi-download"></i> @Model.Downloads.ToString("N0") downloads</span>
+                </div>
+                <div class="d-flex gap-2 mb-3">
+                    @foreach (var fmt in Model.Formats.Split(", "))
+                    {
+                        <span class="badge bg-secondary fs-6">@fmt</span>
+                    }
+                    <span class="badge bg-dark border border-secondary fs-6">@Model.Platforms</span>
+                </div>
+                @if (inCart)
+                {
+                    <a href="/Cart" class="btn btn-success btn-lg"><i class="bi bi-cart-check"></i> Already in Cart</a>
+                }
+                else
+                {
+                    <form method="post" action="/Cart/AddAndStay" class="d-inline">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="/Plugin/Details/@Model.Id" />
+                        <button type="submit" class="btn btn-accent btn-lg"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-7">
+            <h4 class="mb-3">About</h4>
+            <p class="text-secondary">@Model.Description</p>
+
+            <div class="p-3 rounded my-4" style="background: #15161d; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="fw-semibold text-white"><i class="bi bi-volume-up-fill text-info me-2"></i>Interactive Sound Preview</span>
+                        <p class="text-secondary small mb-0">Listen to real-time DSP tone & harmonic characteristics in-browser</p>
+                    </div>
+                    <button id="previewBtn" type="button" class="btn btn-outline-info btn-sm px-3" onclick="toggleTonePreview('@Model.Category')">
+                        <i id="previewIcon" class="bi bi-play-fill me-1"></i> <span id="previewText">Preview Sound</span>
+                    </button>
+                </div>
+            </div>
+
+            <h4 class="mt-4 mb-3">Features</h4>
+            <ul class="list-unstyled feature-list">
+                @foreach (var feature in Model.Features)
+                {
+                    <li><i class="bi bi-check-circle-fill"></i> @feature</li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-5">
+            <h4 class="mb-3">Technical Specifications</h4>
+            <table class="table table-borderless spec-table">
+                <tr><td>Sample Rate</td><td>@Model.SampleRate</td></tr>
+                <tr><td>Bit Depth</td><td>@Model.BitDepth</td></tr>
+                <tr><td>Latency</td><td>@Model.Latency</td></tr>
+                <tr><td>Formats</td><td>@Model.Formats</td></tr>
+                <tr><td>Platforms</td><td>@Model.Platforms</td></tr>
+                <tr><td>Category</td><td>@Model.Category</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+let audioCtx = null;
+let activeOsc = null;
+let activeGain = null;
+
+function toggleTonePreview(category) {
+    const icon = document.getElementById('previewIcon');
+    const text = document.getElementById('previewText');
+    const btn = document.getElementById('previewBtn');
+
+    if (activeOsc) {
+        stopTone();
+        return;
+    }
+
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        activeOsc = audioCtx.createOscillator();
+        activeGain = audioCtx.createGain();
+
+        // Wave shaping curve for tube/analog saturation
+        const shaper = audioCtx.createWaveShaper();
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) {
+            let x = (i * 2) / 256 - 1;
+            curve[i] = (Math.PI + 4) * x / (Math.PI + 4 * Math.abs(x));
+        }
+        shaper.curve = curve;
+
+        if (category.includes('Guitar')) {
+            activeOsc.type = 'sawtooth';
+            activeOsc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3 rock guitar power chord
+        } else if (category.includes('Instruments')) {
+            activeOsc.type = 'sawtooth';
+            activeOsc.frequency.setValueAtTime(110, audioCtx.currentTime); // A2 deep synth bass
+        } else {
+            activeOsc.type = 'sine';
+            activeOsc.frequency.setValueAtTime(440, audioCtx.currentTime); // Clean studio A4
+        }
+
+        activeGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        activeGain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1);
+
+        activeOsc.connect(shaper);
+        shaper.connect(activeGain);
+        activeGain.connect(audioCtx.destination);
+
+        activeOsc.start();
+
+        icon.className = 'bi bi-stop-fill me-1';
+        text.innerText = 'Stop Preview';
+        btn.classList.remove('btn-outline-info');
+        btn.classList.add('btn-danger');
+
+        // Auto stop after 3 seconds
+        setTimeout(() => {
+            if (activeOsc) stopTone();
+        }, 3000);
+
+    } catch (e) {
+        console.error('Audio Preview Error:', e);
+    }
+}
+
+function stopTone() {
+    const icon = document.getElementById('previewIcon');
+    const text = document.getElementById('previewText');
+    const btn = document.getElementById('previewBtn');
+
+    if (activeGain && audioCtx) {
+        activeGain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        setTimeout(() => {
+            if (activeOsc) {
+                try { activeOsc.stop(); } catch(e){}
+                activeOsc.disconnect();
+                activeOsc = null;
+            }
+        }, 60);
+    } else {
+        activeOsc = null;
+    }
+
+    icon.className = 'bi bi-play-fill me-1';
+    text.innerText = 'Preview Sound';
+    btn.classList.remove('btn-danger');
+    btn.classList.add('btn-outline-info');
+}
+</script>
+}
